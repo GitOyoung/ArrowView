@@ -12,7 +12,15 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        
+        let arrow = ArrowView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+        arrow.center = view.center
+        arrow.cornerRadius = 6
+        arrow.arrowDirection = ArrowDirection.Left
+        arrow.arrowOffset = arrow.arrowOffsetValiden(offset: 10)
+        arrow.backColor = UIColor.cyanColor()
+        view.addSubview(arrow)
     }
 
     override func didReceiveMemoryWarning() {
