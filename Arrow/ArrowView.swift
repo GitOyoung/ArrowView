@@ -34,11 +34,8 @@ class ArrowView: UIView {
         }
     }
     
-    var arrowOffset: CGFloat = 0.0 {                //箭头位置偏移
-        didSet {
-            arrowOffsetChanged(offset: arrowOffset)
-        }
-    }
+    var arrowOffset: CGFloat = 0.0                //箭头位置偏移
+ 
     var cornerRadius: CGFloat = 0.0 {               //圆角半径
         didSet {
             layer.cornerRadius = cornerRadius
@@ -55,12 +52,15 @@ class ArrowView: UIView {
     var arrowContainer: UIView?
     var arrow: UIView?                              //箭头
     var main: UIView?                               //主体
-    var contentInset: UIEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0) {
-        didSet {
-            contentInsetChanged()
-        }
-    }
+    var contentInset: UIEdgeInsets = UIEdgeInsets(top: 6, left: 6, bottom: 6, right: 6)
+    var contentChangeFrame: Bool = false
     var contentView: UIView? {
+        
+        willSet {
+            if contentView != nil {
+                contentView?.removeFromSuperview()
+            }
+        }
         didSet {
             contentViewHasSet()
         }
@@ -88,15 +88,19 @@ class ArrowView: UIView {
     {
         if var f = contentView?.frame
         {
-            switch arrowDirection
+            if contentChangeFrame
             {
-            case .Up, .Down:
-                f.size.height += contentInset.top + contentInset.bottom + arrowSize
-            case .Left, .Right:
-                f.size.width  += contentInset.left + contentInset.right + arrowSize
+                switch arrowDirection
+                {
+                case .Up, .Down:
+                    f.size.height += contentInset.top + contentInset.bottom + arrowSize
+                case .Left, .Right:
+                    f.size.width  += contentInset.left + contentInset.right + arrowSize
+                }
+                frame = f
             }
-            frame = f
         }
+        main?.addSubview(contentView!)
     }
     
     func setupSubViews()
@@ -182,14 +186,13 @@ class ArrowView: UIView {
             var frame = v.frame
             frame.origin.x = contentInset.left
             frame.origin.y = contentInset.top
+            frame.size.width = (main?.frame.width)! - contentInset.left - contentInset.right
+            frame.size.height = (main?.frame.height)! - contentInset.top - contentInset.bottom
             v.frame = frame
         }
     }
     
-    func contentInsetChanged()
-    {
-        updateLayout()
-    }
+ 
     
     func arrrowSizeChanged(size s: CGFloat)
     {
@@ -205,8 +208,6 @@ class ArrowView: UIView {
             frame = frm
             arrowContainer?.frame = CGRect(x: 0, y: 0, width: arrowSize * 2, height: arrowSize * 2)
         }
-      
-        updateLayout()
     }
     
     func arrowOffsetValiden(offset o: CGFloat) -> CGFloat
@@ -231,12 +232,7 @@ class ArrowView: UIView {
         }
         return 0.0
     }
-    
-    func arrowOffsetChanged(offset o: CGFloat)
-    {
-        updateLayout()
-    }
-    
+
     func updateDirection()
     {
         if var center = arrow?.center
@@ -263,7 +259,6 @@ class ArrowView: UIView {
     func arrowDirectionChanged(direction d: ArrowDirection)
     {
         updateDirection()
-        updateLayout()
     }
     
     override func layoutSubviews()
